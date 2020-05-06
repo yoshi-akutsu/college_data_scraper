@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/yoshi-akutsu/college_data_scraper#readme",
   "dependencies": {
+    "node-fetch": "^2.6.0",
     "puppeteer": "^3.0.2"
   }
 }
