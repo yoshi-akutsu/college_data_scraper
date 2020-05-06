@@ -2,6 +2,7 @@
 const creds = require('./creds');
 const urls = require('./urls');
 const data_processors = require('./data_processors');
+const scraper = require('./scraper');
 
 // other imports
 const fetch = require('node-fetch');
@@ -77,8 +78,12 @@ async function main() {
   await getSchoolInput();
   readline.close();
 
-  getCollegeData(data_processors.stringToQuery(matches[searchNumber])).then(data => {
-    console.log(data);
+  let scorecardData = getCollegeData(data_processors.stringToQuery(matches[searchNumber])).then(data => {
+    return data;
+  });
+
+  scorecardData.then(data => {
+    console.log(data.results[0].id);
   });
 
 }

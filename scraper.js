@@ -1,69 +1,48 @@
 const puppeteer = require('puppeteer');
-// const CREDS = require('./creds')
 
-const url = 'https://www.premium.usnews.com/best-colleges/ohio-state-6883';
+const unitId = 204796;
 
-async function run() {
+// This is where we'll put the code to get around the tests.
+// const preparePageForTests = async (page) => {
+//   // Pass the User-Agent Test.
+//   const userAgent = 'Mozilla/5.0 (X11; Linux x86_64)' +
+//     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36';
+//   await page.setUserAgent(userAgent);
+// }
+
+async function scrape(unitId) {
+  const APP_FEE_SELECTOR = '#tb_f10854';
+  const REPORTED_DATA_SELECTOR = '#tblLinks > tbody > tr > td:nth-child(1) > a:nth-child(3)';
+  const INST_CHAR_SELECTOR = '#divSurveysContainer > div:nth-child(1) > a';
+
+  const url = 'https://nces.ed.gov/ipeds/datacenter/institutionprofile.aspx?unitId=' + unitId;
 
   const browser = await puppeteer.launch({
     headless: false
   });
 
   const page = await browser.newPage();
-  await page.setDefaultNavigationTimeout(0); 
-
-
-  const USER_ICON_SELECTOR = '#user-circle_a';
-  const LOGIN_SELECTOR = '#app > div > div:nth-child(1) > nav > div.Header__InnerContainer-pfs6rv-5.jTtbyp > div.sm-hide.ml3 > ul > div > a:nth-child(8) > span';
-  const USER_FIELD_SELECTOR = '#username'
-  const PASSWORD_FIELD_SELECTOR = '#password'
-  const BUTTON_SELECTOR = '#login_form > div.Box-s1krs5yn-0.ewBkVU > button > div'
-
+ 
   await page.goto(url);
 
-  await page.click(USER_ICON_SELECTOR);
-  console.log('clicked');
-  await page.click(LOGIN_SELECTOR);
-  console.log('clicked');
+  await page.click(REPORTED_DATA_SELECTOR);
 
-  await page.click(USER_FIELD_SELECTOR);
-  console.log('clicked');
+  await page.waitForSelector(INST_CHAR_SELECTOR);
+  await page.click(INST_CHAR_SELECTOR);
 
-  
-  await page.keyboard.type(CREDS.username);
+  await page.waitForSelector(APP_FEE_SELECTOR);
 
-  await page.click(PASSWORD_FIELD_SELECTOR);
-  await page.keyboard.type(CREDS.password);
-
-  await Promise.all([
-    page.click(BUTTON_SELECTOR),
-    page.waitForNavigation()
-  ]);
-
-  await page.goto(url);
-
-  // Overview page
-  const IN_STATE_TUITION_SELECTOR = '#app > div > div:nth-child(1) > div.Heading__ProfileHeadingBox-s1djxioy-5.hbWdQA > div > div > div > div.Villain__FlexDiv-s187cgcl-0.kOsTiM > div.Villain__SupplementColumn-s187cgcl-2.cAoyTe > div > div > div > div.border-right.border-left.border-bottom.Panel__Content-u1uggs-0.bPAOQc > table > tbody > tr:nth-child(1) > div > a.Anchor-s1mkgztv-0.iQWpFx';
-  const OUT_STATE_TUITION_SELECTOR = '#app > div > div:nth-child(1) > div.Heading__ProfileHeadingBox-s1djxioy-5.hbWdQA > div > div > div > div.Villain__FlexDiv-s187cgcl-0.kOsTiM > div.Villain__SupplementColumn-s187cgcl-2.cAoyTe > div > div > div > div.border-right.border-left.border-bottom.Panel__Content-u1uggs-0.bPAOQc > table > tbody > tr:nth-child(2) > div > a.Anchor-s1mkgztv-0.iQWpFx';
-  const ROOM_BOARD_SELECTOR = '#app > div > div:nth-child(1) > div.Heading__ProfileHeadingBox-s1djxioy-5.hbWdQA > div > div > div > div.Villain__FlexDiv-s187cgcl-0.kOsTiM > div.Villain__SupplementColumn-s187cgcl-2.cAoyTe > div > div > div > div.border-right.border-left.border-bottom.Panel__Content-u1uggs-0.bPAOQc > table > tbody > tr:nth-child(3) > div > a.Anchor-s1mkgztv-0.iQWpFx';
-  
-  let inStateTuition = await page.evaluate((sel) => {
+  let appFee = await page.evaluate((sel) => {
     return document.querySelector(sel).textContent;
-  }, IN_STATE_TUITION_SELECTOR);
-
-  let outStateTuition = await page.evaluate((sel) => {
-    return document.querySelector(sel).textContent;
-  }, OUT_STATE_TUITION_SELECTOR);
-
-  let roomBoard = await page.evaluate((sel) => {
-    return document.querySelector(sel).textContent;
-  }, ROOM_BOARD_SELECTOR);
+  }, APP_FEE_SELECTOR)
   
+  console.log(appFee);
 
-
-  console.log(inStateTuition, outStateTuition, roomBoard);
+  await page.waitForNavigation();
 
   browser.close()
 }
 
-run();
+scrape(unitId);
+
+//exports.scrape = scrape;
