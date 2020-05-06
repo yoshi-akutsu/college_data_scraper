@@ -1,19 +1,10 @@
 const puppeteer = require('puppeteer');
+const selectors = require('./scraper_selectors');
 
 const unitId = 204796;
 
-// This is where we'll put the code to get around the tests.
-// const preparePageForTests = async (page) => {
-//   // Pass the User-Agent Test.
-//   const userAgent = 'Mozilla/5.0 (X11; Linux x86_64)' +
-//     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.39 Safari/537.36';
-//   await page.setUserAgent(userAgent);
-// }
-
 async function scrape(unitId) {
-  const APP_FEE_SELECTOR = '#tb_f10854';
-  const REPORTED_DATA_SELECTOR = '#tblLinks > tbody > tr > td:nth-child(1) > a:nth-child(3)';
-  const INST_CHAR_SELECTOR = '#divSurveysContainer > div:nth-child(1) > a';
+
 
   const url = 'https://nces.ed.gov/ipeds/datacenter/institutionprofile.aspx?unitId=' + unitId;
 
@@ -25,18 +16,60 @@ async function scrape(unitId) {
  
   await page.goto(url);
 
-  await page.click(REPORTED_DATA_SELECTOR);
+  await page.click(selectors.REPORTED_DATA);
 
-  await page.waitForSelector(INST_CHAR_SELECTOR);
-  await page.click(INST_CHAR_SELECTOR);
+  // Institutional Characteristics
+  await page.waitForSelector(selectors.INST_CHAR);
+  await page.click(selectors.INST_CHAR);
 
-  await page.waitForSelector(APP_FEE_SELECTOR);
+  await page.waitForSelector(selectors.APP_FEE);
 
+    // Data points
   let appFee = await page.evaluate((sel) => {
     return document.querySelector(sel).textContent;
-  }, APP_FEE_SELECTOR)
+  }, selectors.APP_FEE)
+
+  let inStateTuition = await page.evaluate((sel) => {
+    return document.querySelector(sel).textContent;
+  }, selectors.IN_STATE_TUITION)
+
+  let outStateTuition = await page.evaluate((sel) => {
+    return document.querySelector(sel).textContent;
+  }, selectors.OUT_STATE_TUITION)
   
-  console.log(appFee);
+  console.log(appFee, inStateTuition, outStateTuition);
+  await page.click(selectors.X_BUTTON);
+
+  // Admissions & Test Scores
+  await page.waitForSelector(selectors.ADMISSION_TEST_SCORES);
+  await page.click(selectors.ADMISSION_TEST_SCORES);
+
+  await page.waitForSelector(selectors.NUM_APPLICANTS);
+
+    // Data points
+  let numApplicants = await page.evaluate((sel) => {
+    return document.querySelector(sel).textContent;
+  }, selectors.NUM_APPLICANTS)
+
+  
+  console.log('Applicants: ' + numApplicants);
+
+  await page.click(selectors.X_BUTTON);
+
+  // Student Financial Aid
+  await page.waitForSelector(selectors.STUDENT_FINAID);
+  await page.click(selectors.STUDENT_FINAID);
+
+  await page.waitForSelector(selectors.INST_GRANTS);
+
+  // Data points
+  let institutionalGrants = await page.evaluate((sel) => {
+    return document.querySelector(sel).textContent;
+  }, selectors.INST_GRANTS)
+
+  console.log('Institutional Grants: ' + institutionalGrants);
+
+  await page.click(selectors.X_BUTTON);
 
   await page.waitForNavigation();
 
