@@ -1,0 +1,22 @@
+{
+  "name": "college_data_scraper",
+  "version": "1.0.0",
+  "description": "A college data scraper that combines an API call to College Scorecard with use of puppeteer to gather data about specific universities. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yoshi-akutsu/college_data_scraper.git"
+  },
+  "author": "Yoshi Akutsu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yoshi-akutsu/college_data_scraper/issues"
+  },
+  "homepage": "https://github.com/yoshi-akutsu/college_data_scraper#readme",
+  "dependencies": {
+    "puppeteer": "^3.0.2"
+  }
+}
