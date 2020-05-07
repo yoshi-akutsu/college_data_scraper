@@ -2,7 +2,7 @@
 const creds = require('./creds');
 const urls = require('./urls');
 const data_processors = require('./data_processors');
-// const scraper = require('./scraper');
+const scraper = require('./stateScraper');
 
 // other imports
 const fetch = require('node-fetch');
@@ -23,7 +23,6 @@ async function getSchoolList() {
 // API call to get json from College Scorecard
 async function getCollegeData(school) {
   const url = urls.college_scorecard + school +creds.ipeds_key;
-  console.log(url);
   const response = await fetch(url);
   let json = response.json();
   return json;
@@ -83,8 +82,7 @@ async function main() {
   });
 
   scorecardData.then(data => {
-    console.log(data)
-    console.log(data.results[0].id);
+    scraper.scrape(data.results[0].id);
   });
 
 }
