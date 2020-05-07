@@ -23,36 +23,44 @@ async function scrape(unitId) {
   await page.waitForSelector(ENROLLMENT_DATA);
   await page.click(ENROLLMENT_DATA);
 
-  await page.waitForSelector(selectors.UNKNOWN);
+  try {
+    await page.waitForSelector(selectors.ALASKA, { timeout: 1500 });
 
-  let data = {};
+    let data = {};
 
-  for (const property in selectors) {
-    data[[property]] = await page.evaluate( (sel) => {
-      if (document.querySelector(sel) !== null) {
-        return document.querySelector(sel).textContent;
-      }
-        return null;
-      }, selectors[property]) 
-  }
-
-  for (const property in data) {
-    if (data[[property]] !== null) {
-      data[[property]] = data[[property]].trim();
-      data[[property]] = data[[property]].replace(/,/g, '');
-      if (data[[property]] === '') {
-        data[[property]] = 0;
-      }
-      else {
-        data[[property]] = parseInt(data[[property]]);
-      }
+    for (const property in selectors) {
+      data[[property]] = await page.evaluate( (sel) => {
+        if (document.querySelector(sel) !== null) {
+          return document.querySelector(sel).textContent;
+        }
+          return null;
+        }, selectors[property]) 
     }
-  }
+    let total = 0;
+    for (const property in data) {
+      
+      if (data[[property]] !== null) {
+        data[[property]] = data[[property]].trim();
+        data[[property]] = data[[property]].replace(/,/g, '');
+        if (data[[property]] === '') {
+          data[[property]] = 0;
+        }
+        else {
+          data[[property]] = parseInt(data[[property]]);
+          total += data[[property]];
+        }
+      }
+      data['TOTAL'] = total;
+    }
 
-  data['SCHOOL_NAME'] = await page.evaluate( (sel) => {
-    return document.querySelector(sel).textContent;
-  }, SCHOOL_NAME)
-  console.log(data);
+    data['SCHOOL_NAME'] = await page.evaluate( (sel) => {
+      return document.querySelector(sel).textContent;
+    }, SCHOOL_NAME)
+    console.log(data);
+  } catch (error) {
+    console.log('Could not get data.');
+  }
+  
   
 
   await browser.close();

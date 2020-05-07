@@ -60,6 +60,5 @@ module.exports = {
   PALAU: '#tb_f6287',
   PUERTO_RICO: '#tb_f6289',
   VIRGIN_ISLANDS: '#tb_f6291',
-  FOREGIN_COUNTRY: '#tb_f6293',
-  TOTAL: '#tblHeader > tbody > tr:nth-child(2) > td > div:nth-child(85) > div:nth-child(4) > table:nth-child(1) > tbody > tr:nth-child(26) > td:nth-child(3)'
+  FOREGIN_COUNTRY: '#tb_f6293'
 }
