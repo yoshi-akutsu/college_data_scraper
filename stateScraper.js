@@ -1,12 +1,29 @@
 const puppeteer = require('puppeteer');
 const selectors = require('./state_selectors');
+const urls = require('./urls');
 
+const mongoose = require('mongoose');
+const fetch = require('node-fetch');
+
+const School = require('./schoolSchema');
+
+mongoose.connect(urls.mongo_db, { useNewUrlParser: true });
+var db = mongoose.connection;
+console.log('DB connected');
+//Bind connection to error event (to get notification of connection errors)
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+let Schema = mongoose.Schema;
 
 // API call to get json of official school names from Google Sheets
 async function getSchoolList() {
-  const response = await fetch(urls.google_sheets);
-  let json = response.json();
-  return json;
+  try {
+    const response = await fetch(urls.google_sheets);
+    let json = response.json();
+    return json;
+  } catch {
+    console.log('Fetch failed.')
+  }
 }
 
 async function scrape(unitId) {
@@ -17,7 +34,7 @@ async function scrape(unitId) {
   const url = 'https://nces.ed.gov/ipeds/datacenter/institutionprofile.aspx?unitId=' + unitId;
 
   const browser = await puppeteer.launch({
-    headless: false
+    headless: true
   });
 
   const page = await browser.newPage();
@@ -66,7 +83,16 @@ async function scrape(unitId) {
     data['SCHOOL_NAME'] = await page.evaluate( (sel) => {
       return document.querySelector(sel).textContent;
     }, SCHOOL_NAME)
+
     console.log(data);
+    let schoolInstance = new School(data);
+    console.log(schoolInstance)
+      schoolInstance.save(function (err) {
+        if (err) {
+          console.log(err)
+        }
+        console.log('Saved successfully.')
+      })
   } catch (error) {
     console.log('Could not get data.');
   }
