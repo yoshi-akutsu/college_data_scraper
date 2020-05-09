@@ -22,7 +22,7 @@ async function getSchoolList() {
 
 // API call to get json from College Scorecard
 async function getCollegeData(school) {
-  const url = urls.college_scorecard + school +creds.ipeds_key;
+  const url = urls.college_scorecard + school + creds.ipeds_key;
   const response = await fetch(url);
   let json = response.json();
   return json;

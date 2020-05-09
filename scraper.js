@@ -76,6 +76,6 @@ async function scrape(unitId) {
   browser.close()
 }
 
-scrape(unitId);
+// scrape(unitId);
 
-//exports.scrape = scrape;
+exports.scrape = scrape;

@@ -2,6 +2,13 @@ const puppeteer = require('puppeteer');
 const selectors = require('./state_selectors');
 
 
+// API call to get json of official school names from Google Sheets
+async function getSchoolList() {
+  const response = await fetch(urls.google_sheets);
+  let json = response.json();
+  return json;
+}
+
 async function scrape(unitId) {
 
   const REPORTED_DATA = '#tblLinks > tbody > tr > td:nth-child(1) > a:nth-child(3)';
@@ -10,18 +17,21 @@ async function scrape(unitId) {
   const url = 'https://nces.ed.gov/ipeds/datacenter/institutionprofile.aspx?unitId=' + unitId;
 
   const browser = await puppeteer.launch({
-    headless: true
+    headless: false
   });
 
   const page = await browser.newPage();
  
   await page.goto(url);
-
-  await page.click(REPORTED_DATA);
+  try {
+    await page.click(REPORTED_DATA);
 
   // Institutional Characteristics
   await page.waitForSelector(ENROLLMENT_DATA);
   await page.click(ENROLLMENT_DATA);
+  } catch {
+    console.log('No reported data.')
+  }
 
   try {
     await page.waitForSelector(selectors.ALASKA, { timeout: 1500 });
