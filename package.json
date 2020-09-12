@@ -19,7 +19,7 @@
   "dependencies": {
     "mongodb": "^3.5.7",
     "mongoose": "^5.9.13",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "puppeteer": "^3.0.2"
   }
 }
